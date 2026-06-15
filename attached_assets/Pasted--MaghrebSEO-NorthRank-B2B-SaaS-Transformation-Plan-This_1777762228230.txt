@@ -1,0 +1,105 @@
+# MaghrebSEO / NorthRank: B2B SaaS Transformation Plan
+
+This plan analyzes the current state of **LaraSEOScan** and outlines the exact steps needed ("chno khaso mazal" / what is still missing) to transition it into the **Big Development Plan: Localized SEO Audit & Competitor Intelligence Platform** using Laravel API and Next.js 15.
+
+## 🎯 What is Missing (Chno Khaso Mazal)
+I have reviewed the current codebase. Here is the gap analysis between what you have and what you want to build:
+
+1. **Frontend Architecture**: You currently have a **Monolithic Laravel app** using Blade, Vite, and Tailwind. Your plan requires a **Headless API architecture** with a separate **Next.js 15** frontend.
+2. **API & Authentication**: `routes/api.php` does not exist. We need to implement API routing and set up **Laravel Sanctum** for token-based auth to communicate with Next.js (using NextAuth/Auth.js).
+3. **Multi-Tenancy**: The database lacks multi-tenancy. We need tables and logic for `agencies` (tenants) and `clients` (projects/websites).
+4. **Rank Tracking & Competitor Intelligence**: The current engine is purely a website *crawler/auditor*. There is no mechanism yet for querying search engines, tracking `keywords`, `keyword_rankings`, or analyzing `competitors`.
+5. **Localization (Arabic/French)**: No multi-lingual setup or Right-to-Left (RTL) UI support is currently configured.
+6. **Billing System**: No Stripe or CMI (Centre Monétique Interbancaire) integration.
+7. **Admin Panel**: Needs FilamentPHP for backend administration.
+
+---
+
+> [!IMPORTANT]
+> **User Review Required**
+> The biggest initial decision is the architecture transition. We need to strip the existing Blade views/routes and expose the SEO scanner via a JSON API. I recommend creating a separate folder for the Next.js frontend (e.g., inside a monorepo setup or a completely separate repository).
+
+## ❓ Open Questions
+1. **Repository Structure**: Do you want the Next.js frontend to live inside the current Laravel folder (as a monorepo, e.g., `/frontend`) or in a completely separate repository?
+2. **Data Fetching API for Rank Tracking**: For keyword ranking and competitor intelligence, which third-party API do you plan to use (e.g., DataForSEO, SerpApi, ValueSerp)? Building a reliable scraper from scratch for Google search results is extremely difficult due to captchas.
+3. **Multi-tenancy approach**: Do you prefer single-database multi-tenancy (adding `tenant_id` to tables) or multi-database (one DB per agency)? (Single DB is highly recommended for MVP).
+
+---
+
+## 🏗️ Proposed Changes (Phased Roadmap)
+
+### Phase 1: API Transition & Authentication
+*Transform the current monolith into a headless API.*
+
+#### [NEW] `routes/api.php`
+- Setup Laravel Sanctum routes (login, register, logout, user profile).
+- Expose the SEO Scanner engine via API endpoints (`POST /api/scan`, `GET /api/scans/{uuid}`).
+
+#### [MODIFY] `app/Http/Controllers/SeoScanController.php`
+- Change methods to return `JsonResponse` instead of Blade views.
+
+#### [NEW] `frontend/` (Next.js 15 App)
+- Initialize Next.js 15 App Router with Tailwind CSS, TypeScript, and Shadcn UI.
+- Set up NextAuth.js configured to use the Laravel API as a credentials provider.
+- Rebuild the dashboard and scan results views in React.
+
+---
+
+### Phase 2: Multi-Tenancy & Project Hierarchy
+*Allow agencies to manage multiple clients/projects.*
+
+#### [NEW] Database Migrations & Models
+- `tenants` (Agencies/Workspaces)
+- `projects` (A client's website within a tenant)
+- Update existing `seo_scans` to belong to a `project_id`.
+
+#### [NEW] `app/Models/Tenant.php` & `app/Models/Project.php`
+- Define Eloquent relationships (`Tenant hasMany Projects`, `Project hasMany SeoScans`).
+- Add global scopes to ensure users only see data belonging to their active tenant.
+
+---
+
+### Phase 3: Rank Tracking & Competitor Intelligence (The Core Growth)
+*Add the daily tracking features.*
+
+#### [NEW] Database Migrations & Models
+- `keywords` (Keyword string, target location e.g., 'MA', language 'ar')
+- `keyword_rankings` (Daily records of rank position, URL, search volume)
+- `competitors` (URLs tracked alongside the main project)
+
+#### [NEW] `app/Services/RankTrackerService.php`
+- Integration with a SERP API (like DataForSEO).
+- Job to run daily to fetch rankings for all active keywords.
+
+#### [NEW] `app/Console/Commands/UpdateDailyRankings.php`
+- Laravel Scheduler command to dispatch ranking updates every night.
+
+---
+
+### Phase 4: Localization, Admin & Billing
+*Prepare for the Maghreb market and monetization.*
+
+#### [NEW] FilamentPHP Admin Panel
+- Install `filament/filament` for managing users, subscriptions, and system health.
+
+#### [MODIFY] Next.js Frontend (Localization)
+- Implement `next-intl` or similar for English, French, and Arabic.
+- Add `dir="rtl"` support in Tailwind config for Arabic UI.
+
+#### [NEW] Subscription Models
+- Implement Laravel Cashier (Stripe) for agency subscriptions.
+- Build custom logic for local Moroccan gateways (e.g., CMI) if required.
+
+---
+
+## 🧪 Verification Plan
+
+### Automated Tests
+- Write Pest/PHPUnit tests for the new API endpoints ensuring JSON structure and correct HTTP status codes.
+- Test Sanctum token issuance and validation.
+- Test Tenant isolation (User A cannot access User B's scans).
+
+### Manual Verification
+- Start both Laravel (API on port 8000) and Next.js (Frontend on port 3000).
+- Authenticate via Next.js and successfully trigger an SEO scan on the backend.
+- Verify RTL alignment when switching language to Arabic in the frontend dashboard.

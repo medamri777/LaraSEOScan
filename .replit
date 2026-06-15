@@ -1,0 +1,58 @@
+modules = ["php-8.2", "nodejs-20", "web", "python-3.11"]
+[agent]
+expertMode = true
+stack = "BEST_EFFORT_FALLBACK"
+
+[nix]
+channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+DB_CONNECTION = "sqlite"
+DB_DATABASE = "/home/runner/workspace/database/database.sqlite"
+APP_URL = "http://localhost:8000"
+APP_NAME = "LaraSEOScan"
+MAIL_MAILER = "smtp"
+MAIL_FROM_ADDRESS = "amrim0085@gmail.com"
+MAIL_FROM_NAME = "NorthRank"
+MAIL_HOST = "smtp.gmail.com"
+MAIL_PORT = "587"
+MAIL_ENCRYPTION = "tls"
+APP_API_URL = "http://localhost:8000"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "php artisan config:cache && php artisan serve --host=0.0.0.0 --port=8000"
+waitForPort = 8000
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+[[ports]]
+localPort = 23636
+externalPort = 3002
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

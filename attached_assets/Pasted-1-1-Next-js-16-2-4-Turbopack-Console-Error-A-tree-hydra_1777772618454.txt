@@ -1,0 +1,134 @@
+1/1
+
+Next.js 16.2.4
+Turbopack
+Console Error
+
+
+A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+See more info here: https://nextjs.org/docs/messages/react-hydration-error
+
+
++
+Client
+-
+Server
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/en/login" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
+                      <div
+                        hidden={true}
+-                       bis_skin_checked="1"
+                      >
+                    ...
+                  ...
+                    <RedirectErrorBoundary router={{...}}>
+                      <InnerLayoutRouter url="/en/login" tree={[...]} params={{locale:"en"}} cacheNode={{rsc:{...}, ...}} ...>
+                        <SegmentViewNode type="layout" pagePath="[locale]/l...">
+                          <SegmentTrieNode>
+                          <link>
+                          <script>
+                          <script>
+                          <script>
+                          <LocaleLayout>
+                            <html lang="en" dir="ltr" className="geist_a715...">
+                              <body
+                                className={"min-h-full antialiased bg-gray-50 "}
+-                               __processed_abb7d0cf-01d6-44ad-9a55-0b603b751411__="true"
+-                               bis_register="W3sibWFzdGVyIjp0cnVlLCJleHRlbnNpb25JZCI6ImVwcGlvY2VtaG1ubGJoanBsY2drb2Zj..."
+                              >
+                                ...
+                                  <SegmentViewNode type="page" pagePath="[locale]/l...">
+                                    <SegmentTrieNode>
+                                    <ClientPageRoot Component={function LoginPage} serverProvidedParams={{...}}>
+                                      <LoginPage params={Promise} searchParams={Promise}>
+                                        <div
+                                          className="min-h-screen flex items-center justify-center px-4 bg-gray-50"
+-                                         bis_skin_checked="1"
+                                        >
+                                          <div
+                                            className="w-full max-w-md space-y-4"
+-                                           bis_skin_checked="1"
+                                          >
+                                            <div
+                                              className="flex justify-end"
+-                                             bis_skin_checked="1"
+                                            >
+                                              <LanguageSwitcher>
+                                                <div
+                                                  className="flex items-center gap-1 border border-gray-200 rounded-lg..."
+-                                                 bis_skin_checked="1"
+                                                >
+                                            <Card className="shadow-lg">
+                                              <div
+                                                data-slot="card"
+                                                data-size="default"
+                                                className={"group/card flex flex-col gap-4 overflow-hidden rounded-xl..."}
+-                                               bis_skin_checked="1"
+                                              >
+                                                <CardHeader className="text-center">
+                                                  <div
+                                                    data-slot="card-header"
+                                                    className="group/card-header @container/card-header grid auto-rows..."
+-                                                   bis_skin_checked="1"
+                                                  >
+                                                    <div
+                                                      className="text-2xl font-bold mb-1"
+-                                                     bis_skin_checked="1"
+                                                    >
+                                                    <CardTitle className="text-xl">
+                                                      <div
+                                                        data-slot="card-title"
+                                                        className="font-heading font-medium group-data-[size=sm]/card:..."
+-                                                       bis_skin_checked="1"
+                                                      >
++                                                       Welcome back
+                                                    <CardDescription>
+                                                      <div
+                                                        data-slot="card-description"
+                                                        className="text-sm text-muted-foreground"
+-                                                       bis_skin_checked="1"
+                                                      >
++                                                       Sign in to your account
+                                                <CardContent>
+                                                  <div
+                                                    data-slot="card-content"
+                                                    className="px-4 group-data-[size=sm]/card:px-3"
+-                                                   bis_skin_checked="1"
+                                                  >
+                                                    <form onSubmit={function handleSubmit} className="space-y-4">
+                                                      <div
+                                                        className="space-y-1.5"
+-                                                       bis_skin_checked="1"
+                                                      >
+                                                      <div
+                                                        className="space-y-1.5"
+-                                                       bis_skin_checked="1"
+                                                      >
+                                                      ...
+                                                    ...
+                      ...
+                  ...
+Call Stack
+17
+
+Show 16 ignore-listed frame(s)
+div
+<anonymous>
